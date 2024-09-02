@@ -7,7 +7,8 @@ import time
 def extract_alpha(input_file_path, output_file_path):
     if not os.path.exists(output_file_path):
         subprocess.run(
-            ["magick", input_file_path, "-strip", "-alpha", "extract", output_file_path]
+            # ["magick", input_file_path, "-strip", "-alpha", "extract", output_file_path]
+            ["C:\\Program Files\\ImageMagick-7.1.1-Q16-HDRI\\magick.exe", input_file_path, "-strip", "-alpha", "extract", output_file_path]
         )
 
 

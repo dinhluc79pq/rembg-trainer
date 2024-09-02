@@ -149,7 +149,7 @@ def get_args():
         "-b",
         "--batch",
         type=int,
-        default=3,
+        default=1,
         help="Size of a single batch loaded into memory. 1 is lowest possible; it may run on 8gb GPUs but also may not. 3 works well on 32gb of shared memory.",
     )
     parser.add_argument(
@@ -307,20 +307,24 @@ def load_checkpoint(net, optimizer, filename="saved_models/checkpoint.pth.tar"):
     return training_counts
 
 
-def load_dataset(img_dir, lbl_dir, ext):
+def load_dataset(img_dir, lbl_dir, img_ext='.jpg', lbl_ext='.png'):
     """
     Loads image and mask filenames from given directories.
 
     Parameters:
         img_dir (str): Directory with images.
         lbl_dir (str): Directory with masks.
-        ext (str): Extension of the image files (e.g., '.png').
+        img_ext (str): Extension of the image files (e.g., '.jpg').
+        lbl_ext (str): Extension of the mask files (e.g., '.png').
 
     Returns:
         list, list: Lists of image and mask filenames.
     """
-    img_list = glob.glob(os.path.join(img_dir, "*" + ext))
-    lbl_list = [os.path.join(lbl_dir, os.path.basename(img)) for img in img_list]
+    # Load images
+    img_list = glob.glob(os.path.join(img_dir, "*" + img_ext))
+
+    # Load corresponding masks
+    lbl_list = [os.path.join(lbl_dir, os.path.basename(img).replace(img_ext, lbl_ext)) for img in img_list]
 
     return img_list, lbl_list
 
@@ -479,8 +483,10 @@ def main():
     global SAVE_FRQ, CHECK_FRQ
     SAVE_FRQ = args.save_frq
     CHECK_FRQ = args.check_frq
-    tra_image_dir = args.tra_image_dir
-    tra_label_dir = args.tra_masks_dir
+    # tra_image_dir = args.tra_image_dir
+    # tra_label_dir = args.tra_masks_dir
+    tra_image_dir = 'images'
+    tra_label_dir = 'masks'
     batch = args.batch
 
     targets = {
@@ -497,8 +503,10 @@ def main():
         os.makedirs("saved_models")
 
     tra_img_name_list, tra_lbl_name_list = load_dataset(
-        tra_image_dir, tra_label_dir, ".png"
+        tra_image_dir, tra_label_dir, img_ext='.jpg', lbl_ext='.png'
     )
+
+    print(tra_img_name_list)
 
     print(f"Images: {format(len(tra_img_name_list))}, masks: {len(tra_lbl_name_list)}")
 
